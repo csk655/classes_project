@@ -37,7 +37,7 @@ var server=http.createServer( function(req,res){
  // just for example
   var user_login=require('./routes/login');
 
-  app.post('/login',user_login.userLogin);
+  app.post('/login',user_login.login);
   
 
 
