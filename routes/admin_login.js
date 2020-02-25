@@ -1,7 +1,7 @@
 var model = require('../config/dbconnect');
 var jwt = require('jsonwebtoken');
-var constants = require('../constants');
-var secretKey = constants.jwtSecretKey.secret;;
+var constants = require('../constant/constant');
+var secretKey = constants.jwtSecretKey.secret;
 
 var adminLogin = function (req, res) {
 
