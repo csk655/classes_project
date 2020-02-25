@@ -38,7 +38,7 @@ var get_messages = require('./routes/getMessageByClass')
 
 var app=express();
 app.use(bodyParser.json()); // Accept JSON params
-app.use(bodyParser({limit:'50mb'}));// for sending large payload size
+//app.use(bodyParser({limit:'50mb'}));// for sending large payload size
 app.use(bodyParser.urlencoded({extended:true}))// Accept URL Encoded params
 app.use(express.static('profile'));
 
@@ -54,7 +54,6 @@ app.get('/verifyuserotp', verify_user.verifyUserOtp)
 
 var apiRoutes = express.Router();
 apiRoutes.use(bodyParser.json());
-apiRoutes.use(bodyParser({ limit: '50mb' }));
 apiRoutes.use(bodyParser.urlencoded({ extended: true }));
 
 apiRoutes.use((req, res, next) => {
