@@ -6,7 +6,7 @@ var pool = mysql.createPool({
     port:'3306',
     user:'root',
     password:'',
-    database:'classes'
+    database:'classes1'
 });
 
 // global setup

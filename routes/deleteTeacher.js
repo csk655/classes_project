@@ -5,9 +5,8 @@ var deleteTeacher = function (req, res) {
 
     console.log(req.query);
     var teacher_id = req.query.teacherId;
-    var class_id = parseInt(req.query.classId);
 
-    if (teacher_id != null && class_id != null) {
+    if (teacher_id != null) {
 
         model(function (err, connection) {
             if (err) {
@@ -15,7 +14,7 @@ var deleteTeacher = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('UPDATE teacher_details SET t_status = ? where t_id=? AND class_id=?', ["Inactive", teacher_id, class_id], function (err, rows) {
+                connection.query('UPDATE teachers SET Status=? WHERE ID=?', ["Inactive", teacher_id], function (err, rows) {
 
                     if (err) {
                         res.status(500);
@@ -37,7 +36,7 @@ var deleteTeacher = function (req, res) {
         });
 
     } else {
-        return res.send(JSON.stringify({ error: true, message: "teacher_id,class_id can not be null" }));
+        return res.send(JSON.stringify({ error: true, message: "teacher_id can not be null" }));
     }
 }
 

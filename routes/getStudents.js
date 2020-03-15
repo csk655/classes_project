@@ -18,8 +18,10 @@ var getStudents = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('SELECT student_id,student_name,student_mobile_no,student_email,student_profile_pic from student_details where class_id=? AND student_standard_id=? AND batch=? AND student_status="Active"'
-                    + ' ORDER BY student_id LIMIT ?,?', [class_id, standard_id, batchId, startIndex, endIndex], function (err, rows) {
+                connection.query('SELECT students.ID, students.Name, students_detail.Standard, students_detail.Batch, students.Email, students.Mobile, students.Gender, students.DOB, students.ProfilePic, students.BloodGroup, students.JoinDate'
+                    + ' from students INNER JOIN students_detail ON students.ID = students_detail.Student'
+                    + ' WHERE students.Class=? AND students_detail.Standard=? AND students_detail.Batch=? AND students.Status = "Active"'
+                    + ' ORDER BY students.ID LIMIT ?,?', [class_id, standard_id, batchId, startIndex, endIndex], function (err, rows) {
 
                         if (err) {
                             res.status(500);
@@ -41,7 +43,7 @@ var getStudents = function (req, res) {
         });
 
     } else {
-        return res.send(JSON.stringify({ error: true, message: "class_id,standard_id,batchId,gender and other fields can not be null" }));
+        return res.send(JSON.stringify({ error: true, message: "class_id,standard_id,batchId and other fields can not be null" }));
     }
 }
 

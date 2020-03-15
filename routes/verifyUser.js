@@ -4,6 +4,7 @@ var constants = require('../constant/constant');
 var secretKey = constants.jwtSecretKey.secret;
 
 var verifyUserOtp = function (req, res) {
+    console.log(req.query)
 
     var type = req.query.type;
     var email = req.query.email;
@@ -12,12 +13,28 @@ var verifyUserOtp = function (req, res) {
 
     if (type != null && email != null && otp != null && token != null) {
         var otpQuery;
-        if (type == "1") { //Teacher
-            otpQuery = 'select OTP from teacher_details where t_email = "' + email + '"';
-        } else if (type == "2") { //Student
-            otpQuery = 'select OTP from student_details where student_email="' + email + '"';
-        } else if (type == "3") {  //parent
-            otpQuery = 'select OTP from parent where email="' + email + '"';
+
+        //Teacher
+        if (type == "1") { 
+            otpQuery = 'SELECT teachers.Name,teachers_otp.OTP'
+                + ' FROM teachers INNER JOIN teachers_otp'
+                + ' ON teachers.ID = teachers_otp.Teacher' 
+                + ' WHERE teachers.Email = "' + email + '"';
+        }
+        //Student
+        else if (type == "2") {
+            otpQuery = 'SELECT students.Name,students_otp.OTP'
+                + ' from students INNER JOIN students_otp'
+                + ' ON students.ID = students_otp.Student'
+                + ' WHERE students.Email = "' + email + '"';
+        }
+        //parent
+        else if (type == "3") {  
+            otpQuery = 'SELECT parents.FatherName,parents_otp.OTP'
+                + ' FROM parents INNER JOIN parents_otp'
+                + ' ON parents.ID = parents_otp.Parent'
+                + ' WHERE parents.Email = "' + email + '"';
+
         } else {
             res.send(JSON.stringify({ error: true, message: 'Wrong user type' }));
             return;
@@ -40,15 +57,30 @@ var verifyUserOtp = function (req, res) {
                             if (selectedRows[0].OTP == otp) {
 
                                 var queryUserData; 
-                                if (type == "1") { //Teacher
-                                    queryUserData = 'select t_id,t_full_name,t_mobile_no,t_gender,t_dob,t_email,t_address,t_experience, t_subject, t_high_qualification,'
-                                        + 't_profile_pic, t_blood_group from teacher_details where t_email = "' + email + '"';
-                                } else if (type == "2") { //Student
-                                    queryUserData = 'select student_id,student_name,student_mobile_no,student_dob,student_standard_id,batch,student_email,student_profile_pic,'
-                                        + 'student_blood_group from student_details where student_email="' + email + '"';
-                                } else if (type == "3") {  //parent
-                                    queryUserData = 'select parent_id,father_name,mother_name,mobile_no,email,address'
-                                        + ' from parent where email="' + email + '"';
+                                //Teacher
+                                if (type == "1") { 
+
+                                    queryUserData = 'SELECT classes.ClassName, classes.ID as ClassId, teachers.ID as TeacherId, teachers.Email, teachers.Name, teachers.Mobile, teachers.Gender,'
+                                    +' teachers.Address, teachers.Experience, teachers.subject, teachers.Qualification, teachers.ProfilePic, teachers.DocPic, teachers.JoinDate'
+                                        + ' FROM classes INNER JOIN teachers ON classes.ID = teachers.Class WHERE teachers.Email = "' + email + '"';
+
+                                }
+                                 //Student
+                                else if (type == "2") {
+                   
+                                    queryUserData = 'SELECT classes.ClassName, classes.ID as ClassId, students.ID as StudentId, students.Email, students.Name, students.Mobile, students.Gender,'
+                                        + ' students.DOB, students.ProfilePic, students.BloodGroup, students.JoinDate'
+                                        + ' `classes` INNER JOIN `class_students` ON `classes`.ID = `class_students`.ClassId  INNER JOIN students ON students.ID = class_students.StudentId WHERE students.Email = "' + email + '"';
+                                }
+                                //parent
+                                else if (type == "3") { 
+
+                                    queryUserData = 'SELECT classes.ClassName, classes.ID as ClassId, parents.ID as ParentId, parents.FatherName, parents.MotherName,'
+                                        + ' parents.Mobile, parents.Email, parents.Address, parents.JoinDate'
+                                        + ' FROM `classes` INNER JOIN `class_parents`'
+                                        + ' ON `classes`.ID = `class_parents`.ClassId'
+                                        + ' INNER JOIN parents ON parents.ID = class_parents.ParentId'
+                                        + ' WHERE `parents`.Email = "' + email + '"';
                                 }
 
                                 connection.query(queryUserData, function (err, selectedRows) {
@@ -59,33 +91,55 @@ var verifyUserOtp = function (req, res) {
                                     else {
                                         if (selectedRows.length > 0) {
 
-                                            var updateTokenMailstatusQuery, id;
-                                            if (type == "1") { //Teacher
-                                                id = selectedRows[0].t_id
-                                                updateTokenMailstatusQuery = 'UPDATE teacher_details SET t_token=?,isVerifiedMail="true" where t_id=?';
-                                            } else if (type == "2") { //Student
-                                                id = selectedRows[0].student_id
-                                                updateTokenMailstatusQuery = 'UPDATE student_details SET student_token=?,isVerifiedMail="true" where student_id=?';
-                                            } else if (type == "3") {  //parent
-                                                id = selectedRows[0].parent_id
-                                                updateTokenMailstatusQuery = 'UPDATE parent SET token=?,isVerifiedMail="true" where parent_id=?';
+                                            var insertTokenQuery, id, changeMailstatusQuery;
+                                            //Teacher
+                                            if (type == "1") { 
+                                                id = selectedRows[0].TeacherId
+                                                insertTokenQuery = 'INSERT INTO teachers_token(Teacher,Token) VALUES (?,?) ON DUPLICATE KEY UPDATE Token=?'
+                                                changeMailstatusQuery = 'UPDATE teachers SET IsVerifiedMail="true" where ID=?';
+                                            }
+                                            //Student
+                                            else if (type == "2") { 
+                                                id = selectedRows[0].StudentId
+                                                insertTokenQuery = 'INSERT INTO students_token(Student,Token) VALUES (?,?) ON DUPLICATE KEY UPDATE Token=?'
+                                                changeMailstatusQuery = 'UPDATE students SET IsVerifiedMail="true" where ID=?';
+                                            }
+                                            //parent
+                                            else if (type == "3") {  
+                                                id = selectedRows[0].ParentId
+                                                insertTokenQuery = 'INSERT INTO parents_token(Parent,Token) VALUES (?,?) ON DUPLICATE KEY UPDATE Token=?'
+                                                changeMailstatusQuery = 'UPDATE parents SET IsVerifiedMail="true" where ID=?';
                                             }
 
 
-                                            connection.query(updateTokenMailstatusQuery, [token, id], function (err, rows) {
+                                            connection.query(changeMailstatusQuery, [id], function (err, rows) {
 
                                                 if (err) {
                                                     res.status(500);
                                                     res.send(JSON.stringify({ error: true, message: err.message }));
 
                                                 } else {
-                                                    let token = jwt.sign({ email: selectedRows[0].email }, secretKey, {})
 
-                                                    res.send(JSON.stringify({ error: false, message: "User login succssfully", result: selectedRows, token: token }));
+                                                        connection.query(insertTokenQuery, [id, token, token], function (err, rows) {
+
+                                                            if (err) {
+                                                                res.status(500);
+                                                                res.send(JSON.stringify({ error: true, message: err.message }));
+
+                                                            } else {
+
+                                                                if (rows.affectedRows > 0) {
+                                                                    let token = jwt.sign({ email: selectedRows[0].Email }, secretKey, {})
+
+                                                                    res.send(JSON.stringify({ error: false, message: "User login succssfully", teacherDetails : selectedRows, token: token }));
+                                                                }
+
+                                                            }
+                                                        });
                                                 }
-                                            });
 
-                                          
+                                            });
+                                            
                                         } else {
                                             res.send(JSON.stringify({ error: true, message: "User or email not exists" }));
                                         }

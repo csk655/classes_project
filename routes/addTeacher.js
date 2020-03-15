@@ -6,7 +6,6 @@ var addTeacher = function (req, res) {
     console.log(req.body);
     var profileUrl, docUrl;
     var class_id = parseInt(req.body.classId);
-    var class_name = req.body.className;
     var full_name = req.body.fullName;
     var mobile_no = req.body.mobileNo;
     var gender = req.body.gender;
@@ -15,7 +14,7 @@ var addTeacher = function (req, res) {
     var dob = req.body.dob;
     var address = req.body.address;
     var experience = req.body.experience;
-    var high_qualification = req.body.highQualification;
+    var qualification = req.body.highQualification;
     var blood_group = req.body.bloodGroup;
     var joining_date = req.body.joiningDate;
     var updated_date = new Date();
@@ -29,8 +28,8 @@ var addTeacher = function (req, res) {
         }
     });
 
-    if (class_id != null && class_name != null && full_name != null && mobile_no != null && gender != null && subject != null && email != null && dob != null && address != null
-        && experience != null && high_qualification != null && blood_group != null && joining_date != null && profileUrl != null && docUrl != null) {
+    if (class_id != null && full_name != null && mobile_no != null && gender != null && subject != null && email != null && dob != null && address != null
+        && experience != null && qualification != null && blood_group != null && joining_date != null && profileUrl != null && docUrl != null) {
       
         model(function (err, connection) {
             if (err) {
@@ -38,9 +37,11 @@ var addTeacher = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('INSERT INTO teacher_details(class_id,class_name,t_full_name, t_mobile_no, t_gender, t_subject, t_profile_pic, t_doc_pic, t_email, t_dob, t_address, t_experience, t_high_qualification, t_blood_group , t_joining_date, t_updated_date) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE' +
-                    ' t_full_name =?, t_gender =? , t_subject =? , t_profile_pic=? , t_doc_pic =?, t_email =?, t_dob =?, t_address =?, t_experience =?, t_high_qualification =?, t_blood_group =?, t_joining_date =?, t_updated_date =?',
-                    [class_id, class_name,full_name, mobile_no, gender, subject, profileUrl, docUrl, email, dob, address, experience, high_qualification, blood_group, joining_date, updated_date, full_name, gender, subject, profileUrl, docUrl, email, dob, address, experience, high_qualification, blood_group, joining_date, updated_date],
+                connection.query('INSERT INTO teachers(Class, Name, Mobile, Gender, Subject, ProfilePic, DocPic, Email, DOB, Address, Experience, Qualification, BloodGroup, JoinDate) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE' +
+                    ' Name=?, Gender=?, Subject=?, ProfilePic=?, DocPic=?, Email=?, DOB=?, Address=?, Experience=?, Qualification=?, BloodGroup=?, JoinDate=?, UpdateDate=?',
+                    [class_id, full_name, mobile_no, gender, subject, profileUrl, docUrl, email, dob, address, experience, qualification, blood_group, joining_date, full_name,
+                        gender, subject, profileUrl, docUrl, email, dob, address, experience, qualification, blood_group, joining_date, updated_date],
+
                     function (err, rows) {
                     if (err) {
                         res.status(500);
@@ -58,11 +59,16 @@ var addTeacher = function (req, res) {
         });
 
     } else {
-        return res.send(JSON.stringify({ error: true, message: "class_id,class_name,full_name,mobile no,subject,other fields can not be null" }));
+        return res.send(JSON.stringify({ error: true, message: "ClassId,Name,Mobile,Subject,other fields can not be null" }));
     }
 }
 
-var photoTest = function (req, res) {
+
+module.exports = { addTeacher };
+
+
+
+/*var photoTest = function (req, res) {
     var profileUrl, docUrl;
     try {
         res.send(req.files);
@@ -83,7 +89,4 @@ var photoTest = function (req, res) {
     } catch (err) {
         res.send(400);
     }
-}
-
-
-module.exports = { addTeacher, photoTest};
+} */

@@ -1,9 +1,11 @@
 {
   "ExpandedNodes": [
     "",
+    "\\config",
+    "\\constant",
     "\\middleware",
     "\\routes"
   ],
-  "SelectedNode": "\\routes\\verifyUser.js",
+  "SelectedNode": "\\config\\dbconnect.js",
   "PreviewInSolutionExplorer": false
 }

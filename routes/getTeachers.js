@@ -14,7 +14,7 @@ var getTeachers = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('SELECT t_id,t_full_name,t_mobile_no,t_gender,t_email,t_dob,t_address,t_experience,t_subject,t_high_qualification,t_profile_pic,t_blood_group,t_joining_date,t_doc_pic,class_id,class_name from teacher_details where class_id=? AND t_status="Active"',
+                connection.query('SELECT ID, Email, Mobile, Gender, Email, DOB, Address, Experience, Subject, Qualification, ProfilePic, DocPic, BloodGroup, JoinDate from teachers where Class=? AND Status="Active"',
                     [class_id], function (err, rows) {
 
                         if (err) {
@@ -27,7 +27,7 @@ var getTeachers = function (req, res) {
                                 res.send(JSON.stringify({ error: false, message: "Data got!", result: rows }));
 
                             } else {
-                                res.send(JSON.stringify({ error: true, message: "No Data found" }));
+                                res.send(JSON.stringify({ error: true, message: "No Data found Or all teachers are inactive" }));
                             }
 
                         }

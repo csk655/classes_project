@@ -14,12 +14,13 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 var verifyToken = require('./middleware/verifyToken')
-var user_login = require('./routes/login_otp');
-var admin_login = require('./routes/admin_login')
+var login_other_user = require('./routes/loginOtherUser');
+var class_login = require('./routes/class_login')
 var verify_user = require('./routes/verifyUser')
 
 var add_teacher = require('./routes/addTeacher');
-var add_student = require('./routes/addStudent');
+var add_new_student = require('./routes/addNewStudent');
+var add_student_already_parent = require('./routes/addStudentAlreadyParent');
 var get_teachers = require('./routes/getTeachers');
 var get_students = require('./routes/getStudents');
 var delete_student = require('./routes/deleteStudent');
@@ -38,7 +39,6 @@ var get_messages = require('./routes/getMessageByClass')
 
 var app=express();
 app.use(bodyParser.json()); // Accept JSON params
-//app.use(bodyParser({limit:'50mb'}));// for sending large payload size
 app.use(bodyParser.urlencoded({extended:true}))// Accept URL Encoded params
 app.use(express.static('profile'));
 
@@ -47,8 +47,8 @@ app.listen(6000, function () {
  });
 
 
-app.get('/login', user_login.loginOtp);
-app.get('/adminlogin', admin_login.adminLogin);
+app.get('/loginotheruser', login_other_user.loginOtherUser);
+app.get('/classlogin', class_login.classLogin);
 app.get('/verifyuserotp', verify_user.verifyUserOtp)
 
 
@@ -64,12 +64,13 @@ apiRoutes.use((req, res, next) => {
 apiRoutes.use(verifyToken);
 
 apiRoutes.post('/createteacher', upload.array('profiles', 2), add_teacher.addTeacher);
-apiRoutes.post('/testprofile', upload.array('profiles', 4), add_teacher.photoTest);
-apiRoutes.post('/addstudent', upload.array('profiles', 1), add_student.addStudent);
+//apiRoutes.post('/testprofile', upload.array('profiles', 4), add_teacher.photoTest);
+apiRoutes.post('/addnewstudent', upload.array('profiles', 1), add_new_student.addNewStudent);
+apiRoutes.post('/addstudentalreadyparent', upload.array('profiles', 1) , add_student_already_parent.addStudentAlreadyParent)
 apiRoutes.get('/getteachersbyclassid', get_teachers.getTeachers); 
 apiRoutes.get('/getstudentsbyclassid', get_students.getStudents);
-apiRoutes.delete('/deletestudentbyclassid', delete_student.deleteStudent);
-apiRoutes.delete('/deleteteacherbyclassid', delete_teacher.deleteTeacher);
+apiRoutes.delete('/deletestudentbyid', delete_student.deleteStudent);
+apiRoutes.delete('/deleteteacherbyid', delete_teacher.deleteTeacher);
 apiRoutes.post('/addstandard', add_standard.addStandard);
 apiRoutes.get('/getstandardsbyclass', get_standard_by_class.getStandardsByClass)
 apiRoutes.post('/addbatchbyclass', add_batch.addBatch);
