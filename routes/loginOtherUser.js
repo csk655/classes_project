@@ -27,7 +27,7 @@ var loginOtherUser = function (req, res) {
                 + ' FROM `classes` INNER JOIN`class_students`'
                 + ' ON `classes`.ID = `class_students`.ClassId'
                 + ' INNER JOIN students ON students.ID = class_students.StudentId'
-                + ' WHERE `students`.`Email`= = "' + email + '" AND `students`.Status="Active"';
+                + ' WHERE `students`.`Email`="' + email + '" AND `students`.Status="Active"';
         }
         //parent
         else if (type == "3") {  

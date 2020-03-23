@@ -16,8 +16,8 @@ var getMessages = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('SELECT n_subject,n_description,n_sent_to,n_date from admin_notification where class_id=? '
-                    + ' ORDER BY notfication_id LIMIT ?,?', [class_id, startIndex, endIndex], function (err, rows) {
+                connection.query('SELECT Subject, Description, SendTo, Date from classes_notification where Class=?'
+                    + ' ORDER BY ID DESC LIMIT ?,?', [class_id, startIndex, endIndex], function (err, rows) {
 
                         if (err) {
                             res.status(500);

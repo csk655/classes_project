@@ -19,14 +19,17 @@ var class_login = require('./routes/class_login')
 var verify_user = require('./routes/verifyUser')
 
 var add_teacher = require('./routes/addTeacher');
+var edit_teacher = require('./routes/editTeacher');
 var add_new_student = require('./routes/addNewStudent');
+var edit_student = require('./routes/editStudent');
 var add_student_already_parent = require('./routes/addStudentAlreadyParent');
+var get_parent = require('./routes/getParentsByClass')
 var get_teachers = require('./routes/getTeachers');
 var get_students = require('./routes/getStudents');
 var delete_student = require('./routes/deleteStudent');
 var delete_teacher = require('./routes/deleteTeacher');
-var add_standard = require('./routes/addStandards');
-var get_standard_by_class = require('./routes/getStandardsByClass')
+var add_standards_batches = require('./routes/addStandardsBatches');
+var get_standards_batches = require('./routes/getStandardsBatches')
 var add_batch = require('./routes/addBatch')
 var get_batch = require('./routes/getBatch')
 var sendSupportMessage = require('./routes/sendSupportMessage');
@@ -63,26 +66,35 @@ apiRoutes.use((req, res, next) => {
 //route middleware to verify a token 
 apiRoutes.use(verifyToken);
 
-apiRoutes.post('/createteacher', upload.array('profiles', 2), add_teacher.addTeacher);
-//apiRoutes.post('/testprofile', upload.array('profiles', 4), add_teacher.photoTest);
+apiRoutes.post('/addnewteacher', upload.array('profiles', 2), add_teacher.addTeacher);
+apiRoutes.put('/editteacher', upload.array('profiles', 2), edit_teacher.editTeacher);
 apiRoutes.post('/addnewstudent', upload.array('profiles', 1), add_new_student.addNewStudent);
-apiRoutes.post('/addstudentalreadyparent', upload.array('profiles', 1) , add_student_already_parent.addStudentAlreadyParent)
-apiRoutes.get('/getteachersbyclassid', get_teachers.getTeachers); 
+apiRoutes.put('/editstudent', upload.array('profiles', 1), edit_student.editStudent);
+apiRoutes.post('/addstudentalreadyparent', upload.array('profiles', 1), add_student_already_parent.addStudentAlreadyParent)
+apiRoutes.get('/getparentbyclass', get_parent.getParentsByClass);
+apiRoutes.get('/getteachersbyclassid', get_teachers.getTeachers);
 apiRoutes.get('/getstudentsbyclassid', get_students.getStudents);
 apiRoutes.delete('/deletestudentbyid', delete_student.deleteStudent);
 apiRoutes.delete('/deleteteacherbyid', delete_teacher.deleteTeacher);
-apiRoutes.post('/addstandard', add_standard.addStandard);
-apiRoutes.get('/getstandardsbyclass', get_standard_by_class.getStandardsByClass)
-apiRoutes.post('/addbatchbyclass', add_batch.addBatch);
-apiRoutes.get('/getbatchsbystandard', get_batch.getBatchesByStandard);
-apiRoutes.post('/sendsupportmessage', sendSupportMessage.sendSupport);
-//for both admin and replying person(we)
-apiRoutes.get('/getsupportmessage', getSuppoertMessages.getSupportMessagesByClass);
-//for our use only
-apiRoutes.post('/sendsupportreply', sendSupportReply.sendSupportReply)
-apiRoutes.get('/getsupportreplybyclass', getSupportReplyClass.getSupportReplyByClass);
-apiRoutes.post('/teacherschedule', upload.single('schedule_photo'), teacherSchedule.uploadSchedule);
+
+//Add/Get Standards and batches
+apiRoutes.post('/addstandardsbatches', add_standards_batches.addStandardBatch);
+apiRoutes.get('/getstandardsbatches', get_standards_batches.getStandardsBatches)
+
+//Send message and get message
 apiRoutes.post('/sendmessage', send_message.sendMessage);
 apiRoutes.get('/getmessagebyclass', get_messages.getMessages);
+
+//Support
+apiRoutes.post('/sendsupportmessage', sendSupportMessage.sendSupport);
+apiRoutes.get('/getsupportmessage', getSuppoertMessages.getSupportMessagesByClass);
+
+//Support reply for our use
+apiRoutes.post('/sendsupportreply', sendSupportReply.sendSupportReply)
+apiRoutes.get('/getsupportreplybyclass', getSupportReplyClass.getSupportReplyByClass);
+
+//Teacher schedule
+apiRoutes.post('/teacherschedule', upload.single('schedule_photo'), teacherSchedule.uploadSchedule);
+
 
 app.use('/', apiRoutes);

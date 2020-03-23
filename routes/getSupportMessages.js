@@ -17,8 +17,8 @@ var getSupportMessagesByClass = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('SELECT support_id,subject,description,date from support where class_id=?'
-                    + ' ORDER BY support_id desc LIMIT ?,?', [class_id, startIndex, endIndex], function (err, rows) {
+                connection.query('SELECT Subject, Description, Date from support where Class=?'
+                    + ' ORDER BY ID desc LIMIT ?,?', [class_id, startIndex, endIndex], function (err, rows) {
 
                     if (err) {
                         res.status(500);

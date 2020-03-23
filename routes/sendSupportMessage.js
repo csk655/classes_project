@@ -20,7 +20,7 @@ var sendSupport = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('INSERT INTO support(class_id, subject, description, date) VALUES(?,?,?,?)',[class_id, subject, description, date], function (err, rows) {
+                connection.query('INSERT INTO support(Class, Subject, Description, Date) VALUES(?,?,?,?)',[class_id, subject, description, date], function (err, rows) {
 
                         if (err) {
                             res.status(500);
@@ -39,7 +39,7 @@ var sendSupport = function (req, res) {
                                         res.send(JSON.stringify({ error: false, message: "Data inserted but not able to send mail to support team" }));
                                     } else {
                                         console.log('Email sent: ' + info.response);
-                                        res.send(JSON.stringify({ error: false, message: "Success ! mail sent" }));
+                                        res.send(JSON.stringify({ error: false, message: "Success! Mail has been sent to support team. We get back to you soon." }));
                                     }
                                 });
 

@@ -14,7 +14,7 @@ var deleteStudent = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('UPDATE students SET status=? where ID=?', ["Inactive", student_id], function (err, rows) {
+                connection.query('UPDATE students SET Status=? where ID=?', ["Inactive", student_id], function (err, rows) {
 
                     if (err) {
                         res.status(500);
@@ -44,23 +44,3 @@ var deleteStudent = function (req, res) {
 
 module.exports = { deleteStudent };
 
-
-
-
-/*connection.query('UPDATE parent SET parent_status = ? where parent_id=?', ["Inactive", student_id], function (err, rows) {
-
-    if (err) {
-        res.status(500);
-        res.send(JSON.stringify({ error: true, message: err.message }));
-    } else {
-
-        if (err) {
-
-            res.send(JSON.stringify({ error: true, message: err.message }));
-
-        } else {
-            res.send(JSON.stringify({ error: false, message: "Success" }));
-        }
-
-    }
-});*/

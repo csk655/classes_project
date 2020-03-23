@@ -22,7 +22,7 @@ var sendMessage = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('INSERT INTO admin_notification(class_id,n_subject,n_description,n_sent_to,n_date) VALUES(?,?,?,?,?)', [class_id, subject, description, send_to, date], function (err, rows) {
+                connection.query('INSERT INTO classes_notification(Class, Subject, Description, SendTo, Date) VALUES(?,?,?,?,?)', [class_id, subject, description, send_to, date], function (err, rows) {
 
                     if (err) {
                         res.status(500);
@@ -30,7 +30,7 @@ var sendMessage = function (req, res) {
                     } else {
 
                         if (rows.affectedRows > 0) {
-
+                             
                             if (send_to != "All") {
 
                                 send_to = send_to.split(',').map(el => {
@@ -38,8 +38,11 @@ var sendMessage = function (req, res) {
                                     return n === 0 ? n : n || el;
                                 });
 
-                                connection.query('SELECT t_token from teacher_details where t_id in (?) AND class_id=? AND t_status="Active"',
-                                    [send_to , class_id], function (err, rows) {
+                                connection.query('SELECT Token FROM teachers INNER JOIN teachers_token'
+                                    + ' ON teachers.ID = teachers_token.Teacher'
+                                    + ' INNER JOIN class_teachers ON teachers.ID = class_teachers.TeacherId'
+                                    + ' WHERE teachers.ID IN (?) AND class_teachers.ClassId =? AND teachers.Status = "Active"', [send_to, class_id], function (err, rows) { 
+
                                         if (err) {
                                             res.status(500);
                                             res.send(JSON.stringify({ error: true, message: err.message }));
@@ -48,37 +51,29 @@ var sendMessage = function (req, res) {
                                             if (rows.length > 0) {
 
                                                 for (var i = 0; i < rows.length; i++) {
-                                                    console.log(rows[i].t_token)
+                                                    console.log(rows[i].Token)
 
-                                                    message.to = rows[i].t_token
+                                                    message.to = rows[i].Token
                                                     message.data.title = subject
                                                     message.data.content = description;
-
 
                                                     fcm.send(message, function (err, response) {
                                                         if (err) {
                                                             console.log("Something has gone wrong! " + err);
-                                                            //res.send(JSON.stringify({ error: false, message: "Data inserted. but Notitfication fail" }));
-
                                                         } else {
                                                             console.log("Successfully sent with response: ", response);
-                                                            //res.send(JSON.stringify({ error: false, message: "Notitfication Success" }));
                                                         }
                                                     });
-
                                                 }
-
                                                 res.send(JSON.stringify({ error: false, message: "Success"}));
 
                                             } else {
                                                 res.send(JSON.stringify({ error: true, message: "No Data found" }));
                                             }
-
                                         }
                                     });
 
                             } else {
-
                                 //topic messaging
                                 message.to = "/topics/"+class_id;
                                 message.data.title = subject;

@@ -26,7 +26,7 @@ var verifyUserOtp = function (req, res) {
             otpQuery = 'SELECT students.Name,students_otp.OTP'
                 + ' from students INNER JOIN students_otp'
                 + ' ON students.ID = students_otp.Student'
-                + ' WHERE students.Email = "' + email + '"';
+                + ' WHERE students.Email = "' + email + '" ';
         }
         //parent
         else if (type == "3") {  
@@ -70,7 +70,9 @@ var verifyUserOtp = function (req, res) {
                    
                                     queryUserData = 'SELECT classes.ClassName, classes.ID as ClassId, students.ID as StudentId, students.Email, students.Name, students.Mobile, students.Gender,'
                                         + ' students.DOB, students.ProfilePic, students.BloodGroup, students.JoinDate'
-                                        + ' `classes` INNER JOIN `class_students` ON `classes`.ID = `class_students`.ClassId  INNER JOIN students ON students.ID = class_students.StudentId WHERE students.Email = "' + email + '"';
+                                        + ' FROM `classes` INNER JOIN `class_students` ON `classes`.ID = `class_students`.ClassId'
+                                        + ' INNER JOIN students ON students.ID = class_students.StudentId'
+                                        + ' WHERE students.Email = "' + email + '"';
                                 }
                                 //parent
                                 else if (type == "3") { 
@@ -131,7 +133,7 @@ var verifyUserOtp = function (req, res) {
                                                                 if (rows.affectedRows > 0) {
                                                                     let token = jwt.sign({ email: selectedRows[0].Email }, secretKey, {})
 
-                                                                    res.send(JSON.stringify({ error: false, message: "User login succssfully", teacherDetails : selectedRows, token: token }));
+                                                                    res.send(JSON.stringify({ error: false, message: "User login succssfully", teacherDetails : selectedRows, jwtToken: token }));
                                                                 }
 
                                                             }

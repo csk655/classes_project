@@ -4,7 +4,7 @@ var model = require('../config/dbconnect');
 var deleteTeacher = function (req, res) {
 
     console.log(req.query);
-    var teacher_id = req.query.teacherId;
+    var teacher_id = req.query.teacherId; 
 
     if (teacher_id != null) {
 

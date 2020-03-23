@@ -36,66 +36,86 @@ var addStudentAlreadyParent = function (req, res) {
                 connection.beginTransaction(function (err) {
                     if (err) { throw err; }
 
-                    connection.query('INSERT INTO students(Name, Mobile, Gender, DOB, Email, ProfilePic, BloodGroup, JoinDate, UpdateDate) VALUES(?,?,?,?,?,?,?,?,?) ON DUPLICATE KEY UPDATE' +
-                        ' Name=?, Mobile=?, Gender=?, DOB=?, Email=?, ProfilePic=?, BloodGroup=?, UpdateDate=?', [student_name, mobile_no, gender, dob, email, profileUrl, blood_group, joining_date, updated_date, student_name, mobile_no, gender, dob, email, profileUrl, blood_group, updated_date], function (err, result) {
 
-                            if (err) {
-                                connection.rollback(function () {
-                                    res.send(JSON.stringify({ error: true, message: err.message }));
-                                    throw err;
-                                });
-                            }
+                    connection.query('SELECT students.ID, students.Email from students INNER JOIN class_students ON students.ID = class_students.StudentId WHERE students.Email = ? AND class_students.ClassId = ?', [email, class_id], function (err, result) {
 
-                            var studentId = parseInt(result.insertId);
-                            console.log(`Student id is ${studentId}`)
+                        if (err) {
+                            connection.rollback(function () {
+                                connection.release();
+                                res.send(JSON.stringify({ error: true, message: err.message }));
+                                throw err;
+                            });
+                        }
 
-                            connection.query('INSERT INTO students_detail(Student, Standard, Batch) VALUES(?,?,?) ON DUPLICATE KEY UPDATE'
-                                + ' Standard=?,Batch=?', [studentId, standard_id, batch, standard_id, batch], function (err, result) {
-                                if (err) {
-                                    connection.rollback(function () {
-                                        res.send(JSON.stringify({ error: true, message: err.message }));
-                                        throw err;
-                                    });
-                                }
+                        if (result.length > 0) {
+                            connection.release();
+                            res.send(JSON.stringify({ error: true, message: "Student already exists" }));
+                        } else {
+                            //Insert the New data
+                            connection.query('INSERT INTO students(Name, Mobile, Gender, DOB, Email, ProfilePic, BloodGroup, JoinDate, UpdateDate) VALUES(?,?,?,?,?,?,?,?,?)',
+                                [student_name, mobile_no, gender, dob, email, profileUrl, blood_group, joining_date, updated_date], function (err, result) {
 
-                                    connection.query('INSERT INTO parent_students(ParentId, StudentId) VALUES(?,?) ON DUPLICATE KEY UPDATE'
-                                        + ' StudentId=?', [parent_id, studentId, studentId], function (err, result) {
-                                        if (err) {
-                                            connection.rollback(function () {
-                                                res.send(JSON.stringify({ error: true, message: err.message }));
-                                                throw err;
-                                            });
+                                    if (err) {
+                                        connection.rollback(function () {
+                                            connection.release();
+                                            res.send(JSON.stringify({ error: true, message: err.message }));
+                                            throw err;
+                                        });
+                                    }
+
+                                    var studentId = parseInt(result.insertId);
+                                    console.log(`Student id is ${studentId}`)
+
+                                    connection.query('INSERT INTO students_detail(Student, Standard, Batch) VALUES(?,?,?)', [studentId, standard_id, batch], function (err, result) {
+                                            if (err) {
+                                                connection.rollback(function () {
+                                                    connection.release();
+                                                    res.send(JSON.stringify({ error: true, message: err.message }));
+                                                    throw err;
+                                                });
                                             }
 
-
-                                            connection.query('INSERT INTO class_students(StudentId,ClassId) VALUES(?,?) ON DUPLICATE KEY UPDATE'
-                                                + ' ClassId=?', [studentId, class_id, class_id], function (err, result) {
+                                            connection.query('INSERT INTO parent_students(ParentId, StudentId) VALUES(?,?)', [parent_id, studentId], function (err, result) {
                                                     if (err) {
                                                         connection.rollback(function () {
+                                                            connection.release();
                                                             res.send(JSON.stringify({ error: true, message: err.message }));
                                                             throw err;
                                                         });
                                                     }
 
 
-                                                    connection.commit(function (err) {
-                                                        if (err) {
-                                                            connection.rollback(function () {
-                                                                res.send(JSON.stringify({ error: true, message: err.message }));
-                                                                throw err;
-                                                            });
-                                                        }
-                                                        res.send(JSON.stringify({ error: false, message: "Success" }));
+                                                    connection.query('INSERT INTO class_students(StudentId,ClassId) VALUES(?,?)', [studentId, class_id], function (err, result) {
+                                                            if (err) {
+                                                                connection.rollback(function () {
+                                                                    connection.release();
+                                                                    res.send(JSON.stringify({ error: true, message: err.message }));
+                                                                    throw err;
+                                                                });
+                                                            }
 
-                                                    });
+                                                            connection.commit(function (err) {
+                                                                if (err) {
+                                                                    connection.rollback(function () {
+                                                                        connection.release();
+                                                                        res.send(JSON.stringify({ error: true, message: err.message }));
+                                                                        throw err;
+                                                                    });
+                                                                } else {
+                                                                    connection.release();
+                                                                    res.send(JSON.stringify({ error: false, message: "Student register successfully!" }));
+                                                                }
+
+                                                            });
+                                                        });
                                                 });
-                                    });
-                                
-                            });
-                        });
+
+                                        });
+                                });
+                        }
+                    });
                 });
 
-                connection.release();
             }
         });
 

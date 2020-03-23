@@ -46,22 +46,18 @@ var addNewStudent = function (req, res) {
 
                             if (err) {
                                 connection.rollback(function () {
+                                    connection.release();
                                     res.send(JSON.stringify({ error: true, message: err.message }));
                                     throw err;
                                 });
                         }
 
-                        if (rows.length > 0) {
-
-                            //Update the current data
-                            res.send(JSON.stringify({ error: false, message: "Student already exists" }));
-
-                            //let studentId = result[0].Id
-                      
+                        if (rows.length > 0)
+                        {
+                            connection.release();
+                            res.send(JSON.stringify({ error: true, message: "Student already exists" }));
 
                         } else {
-
-
                            //Insert the New data
 
                             connection.query('INSERT INTO students(Name, Mobile, Gender, DOB, Email, ProfilePic, BloodGroup, JoinDate, UpdateDate) VALUES(?,?,?,?,?,?,?,?,?)',
@@ -69,6 +65,7 @@ var addNewStudent = function (req, res) {
 
                                     if (err) {
                                         connection.rollback(function () {
+                                            connection.release();
                                             res.send(JSON.stringify({ error: true, message: err.message }));
                                             throw err;
                                         });
@@ -81,19 +78,19 @@ var addNewStudent = function (req, res) {
                                        [studentId, standard_id, batch], function (err, result) {
                                             if (err) {
                                                 connection.rollback(function () {
+                                                    connection.release();
                                                     res.send(JSON.stringify({ error: true, message: err.message }));
                                                     throw err;
                                                 });
                                            }
 
-                                            
                                                    // create/insert parent
-
                                                    connection.query('INSERT INTO parents(FatherName, MotherName, Mobile, Email, Address, JoinDate, UpdateDate) VALUES(?,?,?,?,?,?,?)',
                                                        [father_name, mother_name, parent_mobileNo, parent_email, address, joining_date, updated_date],function (err, result1) {
 
                                                            if (err) {
                                                                connection.rollback(function () {
+                                                                   connection.release();
                                                                    res.send(JSON.stringify({ error: true, message: err.message }));
                                                                    throw err;
                                                                });
@@ -105,7 +102,8 @@ var addNewStudent = function (req, res) {
                                                            connection.query('INSERT INTO parent_students(StudentId, ParentId) VALUES(?,?)',
                                                                [studentId, parentId], function (err, result) {
                                                                    if (err) {
-                                                                       connection.rollback(function () {
+                                                                       connection.rollback(function (){
+                                                                           connection.release();
                                                                            res.send(JSON.stringify({ error: true, message: err.message }));
                                                                            throw err;
                                                                        });
@@ -116,6 +114,7 @@ var addNewStudent = function (req, res) {
                                                                        [class_id, studentId], function (err, result) {
                                                                            if (err) {
                                                                                connection.rollback(function () {
+                                                                                   connection.release();
                                                                                    res.send(JSON.stringify({ error: true, message: err.message }));
                                                                                    throw err;
                                                                                });
@@ -126,6 +125,7 @@ var addNewStudent = function (req, res) {
                                                                                [parentId, class_id], function (err, result) {
                                                                                    if (err) {
                                                                                        connection.rollback(function () {
+                                                                                           connection.release();
                                                                                            res.send(JSON.stringify({ error: true, message: err.message }));
                                                                                            throw err;
                                                                                        });
@@ -135,27 +135,25 @@ var addNewStudent = function (req, res) {
                                                                                    connection.commit(function (err) {
                                                                                        if (err) {
                                                                                            connection.rollback(function () {
+                                                                                               connection.release();
                                                                                                res.send(JSON.stringify({ error: true, message: err.message }));
                                                                                                throw err;
                                                                                            });
+                                                                                       } else {
+                                                                                           connection.release();
+                                                                                           res.send(JSON.stringify({ error: false, message: "Student register successfully!" }));
                                                                                        }
-                                                                                       res.send(JSON.stringify({ error: false, message: "Student register successfully ! " }));
-                                                                                       //connection.end();
+
                                                                                    });
                                                                                });
                                                                        });
                                                                });
                                                        });
-                                     
                                         });
                                 });
-
                         }
-
                      });
                 });
-
-                connection.release();
             }
         });
 
