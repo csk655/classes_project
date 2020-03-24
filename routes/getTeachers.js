@@ -12,8 +12,8 @@ var getTeachers = function (req, res) {
             if (err) {
                 console.log(err);
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
-            } else {
-
+            } else {                                                                                                                                                                            
+                                        
                 connection.query('SELECT teachers.ID, teachers.Email, teachers.Mobile, teachers.Gender, teachers.Email, teachers.DOB,'
                     + ' teachers.Address, teachers.Experience, teachers.Subject, teachers.Qualification, '
                     + ' teachers.ProfilePic, teachers.DocPic, teachers.BloodGroup, teachers.JoinDate'
@@ -21,12 +21,12 @@ var getTeachers = function (req, res) {
                     + ' WHERE class_teachers.ClassId =? AND teachers.Status = "Active"',
                     [class_id], function (err, rows) {
 
-                        if (err) {
+                        if (err) {                                                                                                                                                
                             res.status(500);
                             res.send(JSON.stringify({ error: true, message: err.message }));
-                        } else {
+                        } else {                                                                                                                                                                            
                             if (rows.length > 0) {
-                                res.send(JSON.stringify({ error: false, message: "Data got!", result: rows }));
+                                res.send(JSON.stringify({ error: false, message: "Data got!", teachersData: rows }));
                             } else {
                                 res.send(JSON.stringify({ error: true, message: "No Data found Or all teachers are inactive" }));
                             }

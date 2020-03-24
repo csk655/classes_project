@@ -18,9 +18,11 @@ var getStudents = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('SELECT students.ID, students.Name, students_detail.Standard, students_detail.Batch, students.Email, students.Mobile, students.Gender, students.DOB, students.ProfilePic, students.BloodGroup, students.JoinDate'
-                    + ' from students INNER JOIN students_detail ON students.ID = students_detail.Student'
-                    + ' WHERE students.Class=? AND students_detail.Standard=? AND students_detail.Batch=? AND students.Status = "Active"'
+                connection.query('SELECT students.ID, students.Name, students_detail.Standard, students_detail.Batch, students.Email, students.Mobile,'
+                    + ' students.Gender, students.DOB, students.ProfilePic, students.BloodGroup, students.JoinDate'
+                    + ' FROM students INNER JOIN students_detail ON students.ID = students_detail.Student'
+                    + ' INNER JOIN class_students ON students.ID = class_students.StudentId'
+                    + ' WHERE class_students.ClassId = ? AND students_detail.Standard = ? AND students_detail.Batch = ? AND students.Status = "Active"'
                     + ' ORDER BY students.ID LIMIT ?,?', [class_id, standard_id, batchId, startIndex, endIndex], function (err, rows) {
 
                         if (err) {
@@ -30,7 +32,7 @@ var getStudents = function (req, res) {
 
                             if (rows.length > 0) {
 
-                                res.send(JSON.stringify({ error: false, message: "Data got!", result: rows }));
+                                res.send(JSON.stringify({ error: false, message: "Data got!", studentsData: rows }));
 
                             } else {
                                 res.send(JSON.stringify({ error: true, message: "No Data found" }));

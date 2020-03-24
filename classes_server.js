@@ -72,8 +72,12 @@ apiRoutes.post('/addnewstudent', upload.array('profiles', 1), add_new_student.ad
 apiRoutes.put('/editstudent', upload.array('profiles', 1), edit_student.editStudent);
 apiRoutes.post('/addstudentalreadyparent', upload.array('profiles', 1), add_student_already_parent.addStudentAlreadyParent)
 apiRoutes.get('/getparentbyclass', get_parent.getParentsByClass);
+
+//Get Teachers and Students
 apiRoutes.get('/getteachersbyclassid', get_teachers.getTeachers);
 apiRoutes.get('/getstudentsbyclassid', get_students.getStudents);
+
+//Delete Student and teacher
 apiRoutes.delete('/deletestudentbyid', delete_student.deleteStudent);
 apiRoutes.delete('/deleteteacherbyid', delete_teacher.deleteTeacher);
 

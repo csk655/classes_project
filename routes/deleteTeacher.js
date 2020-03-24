@@ -10,7 +10,7 @@ var deleteTeacher = function (req, res) {
 
         model(function (err, connection) {
             if (err) {
-                console.log(err);
+                console.log(err);   
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
@@ -26,11 +26,11 @@ var deleteTeacher = function (req, res) {
                             res.send(JSON.stringify({ error: true, message: err.message }));
 
                         } else {
-                            res.send(JSON.stringify({ error: false, message: "Success" }));
+                            res.send(JSON.stringify({ error: false, message: "Delete Success" }));
                         }
 
                     }
-                });
+                });                                         
                 connection.release();
             }
         });

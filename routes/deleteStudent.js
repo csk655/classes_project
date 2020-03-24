@@ -27,7 +27,7 @@ var deleteStudent = function (req, res) {
 
                         } else {
 
-                            res.send(JSON.stringify({ error: false, message: "Success" }));
+                            res.send(JSON.stringify({ error: false, message: "Delete Success" }));
 
                         }
                     }
