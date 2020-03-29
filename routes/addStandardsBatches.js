@@ -1,6 +1,6 @@
 var model = require('../config/dbconnect');
 
-var json = {
+/*var json = {
     "Standard_list": [{
         "standard_id": 1,
         "standard_name": "First standard",
@@ -27,7 +27,9 @@ var json = {
             }],
 
         }]
-};
+};*/
+
+
 
 var addStandardBatch = function (req, res) {
 
@@ -44,15 +46,10 @@ var addStandardBatch = function (req, res) {
 
     if (class_id != null && standards_detail != null) {
 
-        var standard_data_insert = [], batch_data_insert = [];
+        var standard_data_insert = [], batch_data_insert = [],  final_batchdata = [];
         var dataPos = 0
 
         for (i = 0; i < standards_detail["Standard_list"].length; i++) {
-
-            /*console.log(standards_detail["Standard_list"][i]["standard_name"])
-            console.log(standards_detail["Standard_list"][i]["standard_id"])
-            console.log(standards_detail["Standard_list"][i]["batches_list"])
-              console.log(standards_detail["Standard_list"][i]["batches_list"])*/
 
               standard_data_insert[i] = [
                 parseInt(class_id),
@@ -60,14 +57,8 @@ var addStandardBatch = function (req, res) {
                 standards_detail["Standard_list"][i]["standard_name"],
                 JSON.stringify(standards_detail["Standard_list"][i]["batches_list"])]
 
-            //
-
             for (j = 0; j < standards_detail["Standard_list"][i]["batches_list"].length; j++) {
-
-                /*console.log("-----")
-                console.log(standards_detail["Standard_list"][i]["batches_list"][j]["batch_id"])
-                console.log(standards_detail["Standard_list"][i]["batches_list"][j]["batch_name"])*/
-                
+         
                 batch_data_insert[dataPos] = [parseInt(class_id),
                     parseInt(standards_detail["Standard_list"][i]["standard_id"]),
                     parseInt(standards_detail["Standard_list"][i]["batches_list"][j]["batch_id"]),
@@ -79,14 +70,18 @@ var addStandardBatch = function (req, res) {
         console.log(standard_data_insert)
         console.log(batch_data_insert)
 
+        for (k = 0; k < standard_data_insert.length; k++) {
+            final_batchdata[k] = [standard_data_insert[k][3]]
+        }
+        console.log(final_batchdata)
 
         model(function (err, connection) {
             if (err) {
                 console.log(err);
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
-
-                connection.query('INSERT INTO standards(Class, StandardId, StandardName, Batches) VALUES ?',
+                 
+                connection.query('insert into standards(class, standardid, standardname, batches) values ? on duplicate key update batches = values(batches)',
                     [standard_data_insert], function (err, rows) {
 
                         if (err) {
@@ -95,8 +90,8 @@ var addStandardBatch = function (req, res) {
                         } else {
 
                             if (rows.affectedRows > 0) {
-
-                                connection.query('INSERT INTO batches(Class, Standard, BatchId, BatchName) VALUES ?',
+                          
+                                connection.query('INSERT INTO batches(class, standard, batchid, batchname) values ? on duplicate key update batchname = values(batchname)',
                                     [batch_data_insert], function (err, rows) {
 
                                         if (err) {
@@ -105,7 +100,7 @@ var addStandardBatch = function (req, res) {
                                         } else {
 
                                             if (rows.affectedRows > 0) {
-                                                res.send(JSON.stringify({ error: false, message: "Success" }));
+                                                res.send(JSON.stringify({ error: false, message: "success" }));
                                             }
                                         }
                                     });
@@ -115,6 +110,7 @@ var addStandardBatch = function (req, res) {
                 connection.release();
             }
         });   
+
 
     } else {
         return res.send(JSON.stringify({ error: true, message: "classId,standard details can not be null" }));

@@ -1,9 +1,6 @@
 {
   "ExpandedNodes": [
     "",
-    "\\config",
-    "\\constant",
-    "\\middleware",
     "\\routes"
   ],
   "SelectedNode": "\\routes\\getStandardsBatches.js",

@@ -1,10 +1,11 @@
 var model = require('../config/dbconnect');
+var fs = require('fs')
 
 
 var editTeacher = function (req, res) {
 
     console.log(req.body);
-    var profileUrl, docUrl;
+    var new_profile, new_doc
     var teacher_id = parseInt(req.body.teacherId);
     var full_name = req.body.fullName;
     var mobile_no = req.body.mobileNo;
@@ -16,19 +17,23 @@ var editTeacher = function (req, res) {
     var experience = req.body.experience;
     var qualification = req.body.highQualification;
     var blood_group = req.body.bloodGroup;
+    var is_profilechange = req.body.isProfileChange;
+    var last_profile = req.body.lastProfile;
+    var isDocChange = req.body.isDocChange;
+    var last_doc = req.body.lastDoc;
     var updated_date = new Date();
 
     var paths = req.files.map(file => {
         var temp = file.originalname;
         if (temp.includes("profile")) {
-            profileUrl = file.filename;
+            new_profile = file.filename;
         } else {
-            docUrl = file.filename;
+            new_doc = file.filename;
         }
     });
-
+   
     if (teacher_id != null && full_name != null && mobile_no != null && gender != null && subject != null && email != null && dob != null && address != null
-        && experience != null && qualification != null && blood_group != null && profileUrl != null && docUrl != null) {
+        && experience != null && qualification != null && blood_group != null) {
 
         model(function (err, connection) {
             if (err) {
@@ -40,10 +45,43 @@ var editTeacher = function (req, res) {
                 connection.beginTransaction(function (err) {
                     if (err) { throw err; }
 
-                            //Update data
-                            connection.query('UPDATE teachers SET Name=?, Mobile=?, Gender=?, Subject=?, ProfilePic=?, DocPic=?, Email=?, DOB=?, Address=?, Experience=?,'
-                                + ' Qualification=?, BloodGroup=?, UpdateDate=? WHERE ID = ? ', [full_name, mobile_no, gender, subject, profileUrl, docUrl, email, dob,
-                                    address, experience, qualification, blood_group, updated_date, teacher_id], function (err, results) {
+                    var query = null
+                    if (is_profilechange == "Yes" && isDocChange == "Yes") {
+
+                        if (new_profile != null && new_doc != null) {
+                            query = 'UPDATE teachers SET Name="' + full_name + '", Mobile="' + mobile_no + '", Gender="' + gender + '", Subject="' + subject + '", ProfilePic="' + new_profile + '",'
+                                + 'DocPic ="' + new_doc + '", Email="' + email + '", DOB="' + dob + '", Address="' + address + '", Experience="' + experience + '", '
+                                + ' Qualification="' + qualification + '", BloodGroup="' + blood_group + '", UpdateDate="' + updated_date + '" WHERE ID ="' + teacher_id + '" '
+                        } else {
+                            return res.send(JSON.stringify({ error: true, message: "new_profile,new_doc can not be null" }));
+                        }
+                     
+                    } else if (is_profilechange == "Yes") {
+
+                        if (new_profile != null) {
+                            query = 'UPDATE teachers SET Name="' + full_name + '", Mobile="' + mobile_no + '", Gender="' + gender + '", Subject="' + subject + '", ProfilePic="' + new_profile + '",'
+                                + 'Email="' + email + '", DOB="' + dob + '", Address="' + address + '", Experience="' + experience + '", '
+                                + ' Qualification="' + qualification + '", BloodGroup="' + blood_group + '", UpdateDate="' + updated_date + '" WHERE ID ="' + teacher_id + '" '
+                        } else {
+                            return res.send(JSON.stringify({ error: true, message: "new_profile can not be null" }));
+                        }
+                 
+                    } else if (isDocChange == "Yes") {
+                        if (new_doc != null) {
+                            query = 'UPDATE teachers SET Name="' + full_name + '", Mobile="' + mobile_no + '", Gender="' + gender + '", Subject="' + subject + '",'
+                                + 'DocPic ="' + new_doc + '", Email="' + email + '", DOB="' + dob + '", Address="' + address + '", Experience="' + experience + '", '
+                                + ' Qualification="' + qualification + '", BloodGroup="' + blood_group + '", UpdateDate="' + updated_date + '" WHERE ID ="' + teacher_id + '" '
+                        } else {
+                            return res.send(JSON.stringify({ error: true, message: "new_doc can not be null" }));
+                        }
+                        
+                    } else {
+                        query = 'UPDATE teachers SET Name="' + full_name + '", Mobile="' + mobile_no + '", Gender="' + gender + '", Subject="' + subject + '",'
+                            + 'Email="' + email + '", DOB="' + dob + '", Address="' + address + '", Experience="' + experience + '", '
+                            + 'Qualification="' + qualification + '", BloodGroup="' + blood_group + '", UpdateDate="' + updated_date + '" WHERE ID ="' + teacher_id + '" '
+                    }
+                      
+                    connection.query(query, function (err, results) {
                                     if (err) {
                                         connection.rollback(function () {
                                             connection.release();
@@ -53,7 +91,8 @@ var editTeacher = function (req, res) {
                                         });
                                     } else {
 
-                                        if (results.affectedRows > 0){
+                                        if (results.affectedRows > 0) {
+
                                             connection.commit(function (err) {
                                                 if (err) {
                                                     connection.rollback(function () {
@@ -62,6 +101,29 @@ var editTeacher = function (req, res) {
                                                         throw err;
                                                     });
                                                 } else {
+
+                                                    if (is_profilechange == "Yes" && isDocChange == "Yes") {
+                                                        try {
+                                                            fs.unlinkSync('D:/node js files/Classes Project backend/profile/' + last_profile);
+                                                            fs.unlinkSync('D:/node js files/Classes Project backend/profile/' + last_doc);
+                                                        } catch (err) {
+                                                            // handle the error
+                                                            console.log(err)
+                                                        }
+                                                    } else if (is_profilechange == "Yes") {
+                                                        try {
+                                                            fs.unlinkSync('D:/node js files/Classes Project backend/profile/' + last_profile);
+                                                        } catch (err) {
+                                                            console.log(err)
+                                                        }
+                                                    } else if (isDocChange == "Yes") {
+                                                        try {
+                                                            fs.unlinkSync('D:/node js files/Classes Project backend/profile/' + last_doc);
+                                                        } catch (err) {
+                                                            console.log(err)
+                                                        }
+                                                    }
+
                                                     res.send(JSON.stringify({ error: false, message: "Teacher updated successfully!" }));
                                                     connection.release();
                                                 }
