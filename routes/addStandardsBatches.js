@@ -27,7 +27,15 @@ var model = require('../config/dbconnect');
             }],
 
         }]
-};*/
+};
+
+ var final_batchdata = [];
+        for (k = 0; k < standard_data_insert.length; k++) {
+            final_batchdata[k] = [standard_data_insert[k][3]]
+        }
+        console.log(final_batchdata)
+
+*/
 
 
 
@@ -46,7 +54,7 @@ var addStandardBatch = function (req, res) {
 
     if (class_id != null && standards_detail != null) {
 
-        var standard_data_insert = [], batch_data_insert = [],  final_batchdata = [];
+        var standard_data_insert = [], batch_data_insert = []
         var dataPos = 0
 
         for (i = 0; i < standards_detail["Standard_list"].length; i++) {
@@ -69,11 +77,6 @@ var addStandardBatch = function (req, res) {
 
         console.log(standard_data_insert)
         console.log(batch_data_insert)
-
-        for (k = 0; k < standard_data_insert.length; k++) {
-            final_batchdata[k] = [standard_data_insert[k][3]]
-        }
-        console.log(final_batchdata)
 
         model(function (err, connection) {
             if (err) {
