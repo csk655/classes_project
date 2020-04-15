@@ -1,8 +1,10 @@
 {
   "ExpandedNodes": [
     "",
-    "\\routes"
+    "\\config",
+    "\\routes",
+    "\\routes\\FeesStructure"
   ],
-  "SelectedNode": "\\routes\\getStandardsBatches.js",
+  "SelectedNode": "\\routes\\getExamsByClass.js",
   "PreviewInSolutionExplorer": false
 }

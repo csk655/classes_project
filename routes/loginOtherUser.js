@@ -7,18 +7,20 @@ var loginOtherUser = function (req, res) {
 
     var type = req.query.type;
     var email = req.query.email;
+    var class_id = parseInt(req.query.classId);
 
-    if (type != null && email != null ) {
+    if (type != null && email != null && class_id != null) {
 
         var query;
 
         //Teacher
         if (type == "1") { 
-            
-            query = 'SELECT `teachers`.ID, `classes`.ClassName'
-                + ' FROM `classes` INNER JOIN `teachers`'
-                + ' ON `classes`.ID = `teachers`.Class '
-                + ' WHERE `classes`.Email = "' + email + '" AND `teachers`.Status="Active"';
+
+            query = 'SELECT teachers.ID, `classes`.ClassName'
+                + ' FROM `classes` INNER JOIN `class_teachers`'
+                + ' ON`classes`.ID = `class_teachers`.ClassId'
+                + ' INNER JOIN teachers ON`teachers`.ID = `class_teachers`.`TeacherId`'
+                + ' WHERE teachers.Email="' + email + '" AND  classes.ID ="' + class_id +'" AND `teachers`.Status="Active"'
         }
         //Student
         else if (type == "2") { 
@@ -27,7 +29,7 @@ var loginOtherUser = function (req, res) {
                 + ' FROM `classes` INNER JOIN`class_students`'
                 + ' ON `classes`.ID = `class_students`.ClassId'
                 + ' INNER JOIN students ON students.ID = class_students.StudentId'
-                + ' WHERE `students`.`Email`="' + email + '" AND `students`.Status="Active"';
+                + ' WHERE `students`.`Email`="' + email + '" AND classes.ID ="' + class_id +'" AND `students`.Status="Active"';
         }
         //parent
         else if (type == "3") {  
@@ -36,7 +38,7 @@ var loginOtherUser = function (req, res) {
                 + ' FROM `classes` INNER JOIN `class_parents`'
                 + ' ON `classes`.ID = `class_parents`.ClassId'
                 + ' INNER JOIN parents ON parents.ID = class_parents.ParentId'
-                + ' WHERE `parents`.`Email` = "' + email + '" AND `parents`.Status = "Active"';
+                + ' WHERE `parents`.`Email`= "' + email + '" AND classes.ID ="' + class_id +'" AND `parents`.Status = "Active"';
 
         } else {
             res.send(JSON.stringify({ error: true, message: 'Wrong user type' }));
@@ -112,7 +114,7 @@ var loginOtherUser = function (req, res) {
         });
 
     } else {
-        return res.send(JSON.stringify({ error: true, message: "type,email,password can not be null" }));
+        return res.send(JSON.stringify({ error: true, message: "type,email,class_id can not be null" }));
     }
 }
 

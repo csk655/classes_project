@@ -16,6 +16,8 @@ var deleteStudent = function (req, res) {
 
                 connection.query('UPDATE students SET Status=? where ID=?', ["Inactive", student_id], function (err, rows) {
 
+                    connection.release();
+
                     if (err) {
                         res.status(500);
                         res.send(JSON.stringify({ error: true, message: err.message }));
@@ -32,7 +34,7 @@ var deleteStudent = function (req, res) {
                         }
                     }
                 });
-                connection.release();
+                
             }
         });
 

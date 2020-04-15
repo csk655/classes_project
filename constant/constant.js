@@ -16,15 +16,15 @@ var transporter = nodemailer.createTransport({
     secure: true,
     port: 465,
     auth: {
-        user: 'codelearners2019@gmail.com',
-        pass: 'glass@2019'
+        user: 'sglsoftwaresolutions20@gmail.com',
+        pass: 'sgl@1234'
     }, tls: {
         rejectUnauthorized: false
     }
 });
 
 var mailOptions = {
-    from: 'codelearners2019@gmail.com',
+    from: 'sglsoftwaresolutions20@gmail.com',
     to: 'csk655@gmail.com',
     subject: 'Class project support',
     text: 'description apperas here'
