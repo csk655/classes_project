@@ -18,8 +18,8 @@ var getStudents = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('SELECT students.ID, students.Name, students_detail.Standard, students_detail.Batch, students.Email, students.Mobile,'
-                    + ' students.Gender, students.DOB, students.ProfilePic, students.BloodGroup, students.JoinDate'
+                connection.query('SELECT students.id, students.name, students_detail.standard, students_detail.batch, students.email, students.mobile,'
+                    + ' students.gender, students.dob, students.profilePic, students.bloodGroup, students.joinDate'
                     + ' FROM students INNER JOIN students_detail ON students.ID = students_detail.Student'
                     + ' INNER JOIN class_students ON students.ID = class_students.StudentId'
                     + ' WHERE class_students.ClassId = ? AND students_detail.Standard = ? AND students_detail.Batch = ? AND students.Status = "Active"'

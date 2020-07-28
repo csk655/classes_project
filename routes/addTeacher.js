@@ -1,6 +1,5 @@
 var model = require('../config/dbconnect');
 
-
 var addTeacher = function (req, res) {
 
     console.log(req.body);
@@ -19,14 +18,9 @@ var addTeacher = function (req, res) {
     var joining_date = new Date();
     var updated_date = new Date();
 
-    var paths = req.files.map(file => {
-        var temp = file.originalname;
-        if (temp.includes("profile")) {
-            profileUrl = file.filename;
-        } else {
-            docUrl = file.filename;
-        }
-    });
+    var profileUrl = "http://10.0.2.2:6000/public/" +req.files['profile'][0].filename;
+    var docUrl = "http://10.0.2.2:6000/public/" +req.files['document'][0].filename;
+
 
     if (class_id != null && full_name != null && mobile_no != null && gender != null && subject != null && email != null && dob != null && address != null
         && experience != null && qualification != null && blood_group != null && joining_date != null && profileUrl != null && docUrl != null) {
@@ -36,7 +30,6 @@ var addTeacher = function (req, res) {
                 console.log(err);
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
-
 
                 // Begin transaction 
                 connection.beginTransaction(function (err) {
@@ -142,4 +135,7 @@ module.exports = { addTeacher };
     } catch (err) {
         res.send(400);
     }
-} */
+} 
+
+
+*/

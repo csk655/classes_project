@@ -29,4 +29,5 @@ var getConnection = function (cb) {
         cb(null, connection);
     });
 };
+
 module.exports = getConnection;

@@ -1,5 +1,6 @@
 var model = require('../config/dbconnect');
 var fs = require('fs')
+var path = require("path");
 
 
 var editTeacher = function (req, res) {
@@ -17,20 +18,16 @@ var editTeacher = function (req, res) {
     var experience = req.body.experience;
     var qualification = req.body.highQualification;
     var blood_group = req.body.bloodGroup;
-    var is_profilechange = req.body.isProfileChange;
+    var isProfilechange = req.body.isProfileChange;
     var last_profile = req.body.lastProfile;
     var isDocChange = req.body.isDocChange;
     var last_doc = req.body.lastDoc;
     var updated_date = new Date();
 
-    var paths = req.files.map(file => {
-        var temp = file.originalname;
-        if (temp.includes("profile")) {
-            new_profile = file.filename;
-        } else {
-            new_doc = file.filename;
-        }
-    });
+    if (isProfilechange == "Yes")
+        new_profile = "http://10.0.2.2:6000/public/"+req.files['profile'][0].filename; //change this and below line at server side
+    if (isDocChange == "Yes")
+        new_doc = "http://10.0.2.2:6000/public/" +req.files['document'][0].filename;
    
     if (teacher_id != null && full_name != null && mobile_no != null && gender != null && subject != null && email != null && dob != null && address != null
         && experience != null && qualification != null && blood_group != null) {
@@ -41,12 +38,11 @@ var editTeacher = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                // Begin transaction 
                 connection.beginTransaction(function (err) {
                     if (err) { throw err; }
 
                     var query = null
-                    if (is_profilechange == "Yes" && isDocChange == "Yes") {
+                    if (isProfilechange == "Yes" && isDocChange == "Yes") {
 
                         if (new_profile != null && new_doc != null) {
                             query = 'UPDATE teachers SET Name="' + full_name + '", Mobile="' + mobile_no + '", Gender="' + gender + '", Subject="' + subject + '", ProfilePic="' + new_profile + '",'
@@ -56,7 +52,7 @@ var editTeacher = function (req, res) {
                             return res.send(JSON.stringify({ error: true, message: "new_profile,new_doc can not be null" }));
                         }
                      
-                    } else if (is_profilechange == "Yes") {
+                    } else if (isProfilechange == "Yes") {
 
                         if (new_profile != null) {
                             query = 'UPDATE teachers SET Name="' + full_name + '", Mobile="' + mobile_no + '", Gender="' + gender + '", Subject="' + subject + '", ProfilePic="' + new_profile + '",'
@@ -101,31 +97,25 @@ var editTeacher = function (req, res) {
                                                         throw err;
                                                     });
                                                 } else {
+                                                    try {
 
-                                                    if (is_profilechange == "Yes" && isDocChange == "Yes") {
-                                                        try {
-                                                            fs.unlinkSync('D:/node js files/Classes Project backend/profile/' + last_profile);
-                                                            fs.unlinkSync('D:/node js files/Classes Project backend/profile/' + last_doc);
-                                                        } catch (err) {
-                                                            // handle the error
-                                                            console.log(err)
+                                                        if (isProfilechange == "Yes") {
+                                                            fs.unlinkSync(path.resolve("./public/" + last_profile));
                                                         }
-                                                    } else if (is_profilechange == "Yes") {
-                                                        try {
-                                                            fs.unlinkSync('D:/node js files/Classes Project backend/profile/' + last_profile);
-                                                        } catch (err) {
-                                                            console.log(err)
+                                                        if (isDocChange == "Yes") {
+                                                            fs.unlinkSync(path.resolve("./public/" + last_doc));
                                                         }
-                                                    } else if (isDocChange == "Yes") {
-                                                        try {
-                                                            fs.unlinkSync('D:/node js files/Classes Project backend/profile/' + last_doc);
-                                                        } catch (err) {
-                                                            console.log(err)
-                                                        }
+                                                    }
+                                                    catch (err) {
+                                                        console.log(err)
+                                                        res.send(JSON.stringify({ error: true, message: "Teacher updated but file not found to delete"}));
+                                                        connection.release();
+                                                        return
                                                     }
 
                                                     res.send(JSON.stringify({ error: false, message: "Teacher updated successfully!" }));
                                                     connection.release();
+
                                                 }
                                             });
                                         } else {

@@ -4,8 +4,14 @@ var multer = require('multer');
 const path = require('path');
 
 var storage = multer.diskStorage({
-    destination: function (req, res, cb) {
-        cb(null, path.join(__dirname, '/profile/'));
+    destination: function (req, file, cb) {
+
+        cb(null, path.join(__dirname, '/public/'));
+        /*if (file.originalname.includes("profile")) {
+            cb(null, path.join(__dirname, '/profile/'));
+        } else {
+            cb(null, path.join(__dirname, '/document/'));
+        }*/
     },
     filename: function (req, file, cb) {
         cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
@@ -33,6 +39,10 @@ var delete_student = require('./routes/deleteStudent');
 var delete_teacher = require('./routes/deleteTeacher');
 var add_standards_batches = require('./routes/addStandardsBatches');
 var get_standards_batches = require('./routes/getStandardsBatches');
+var get_standards = require('./routes/getStandards')
+var get_batches = require('./routes/getBatchByStandardId')
+
+var delete_standard_batches = require('./routes/deleteStandardBatch')
 var sendSupportMessage = require('./routes/sendSupportMessage');
 var getSuppoertMessages = require('./routes/getSupportMessages');
 var sendSupportReply = require('./routes/sendSupportReply');
@@ -59,9 +69,9 @@ var get_class_exams = require('./routes/getExamsByClass')
 
 
 var app=express();
-app.use(bodyParser.json()); // Accept JSON params
-app.use(bodyParser.urlencoded({extended:true}))// Accept URL Encoded params
-app.use(express.static('profile'));
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({extended:true}))
+app.use("/public", express.static('public'));
 
 app.listen(6000, function () {
     console.log("Server app listening on port 6000")
@@ -84,11 +94,11 @@ apiRoutes.use((req, res, next) => {
 //route middleware to verify a token 
 apiRoutes.use(verifyToken);
 
-apiRoutes.post('/addnewteacher', upload.array('profiles', 2), add_teacher.addTeacher);
-apiRoutes.put('/editteacher', upload.array('profiles', 2), edit_teacher.editTeacher);
-apiRoutes.post('/addnewstudent', upload.array('profiles', 1), add_new_student.addNewStudent);
+apiRoutes.post('/addnewteacher', upload.fields([{ name: 'profile', maxCount: 1},{ name: 'document', maxCount: 1 }]), add_teacher.addTeacher);
+apiRoutes.put('/editteacher', upload.fields([{ name: 'profile', maxCount: 1 }, { name: 'document', maxCount: 1 }]), edit_teacher.editTeacher);
+apiRoutes.post('/addnewstudent', upload.fields([{ name: 'profile', maxCount: 1 }]), add_new_student.addNewStudent);
 apiRoutes.put('/editstudent', upload.array('profiles', 1), edit_student.editStudent);
-apiRoutes.post('/addstudentalreadyparent', upload.array('profiles', 1), add_student_already_parent.addStudentAlreadyParent)
+apiRoutes.post('/addstudentalreadyparent', upload.fields([{ name: 'profile', maxCount: 1 }]), add_student_already_parent.addStudentAlreadyParent)
 apiRoutes.get('/getparentbyclass', get_parent.getParentsByClass);
 
 //Get Teachers and Students
@@ -102,6 +112,7 @@ apiRoutes.delete('/deleteteacherbyid', delete_teacher.deleteTeacher);
 //Add/Get Standards and batches
 apiRoutes.post('/addstandardsbatches', add_standards_batches.addStandardBatch);
 apiRoutes.get('/getstandardsbatches', get_standards_batches.getStandardsBatches)
+apiRoutes.delete('/deletestandardbatch', delete_standard_batches.deleteStandardBatch)
 
 //Send message and get message
 apiRoutes.post('/sendmessage', send_message.sendMessage);
@@ -123,6 +134,9 @@ apiRoutes.post('/addfeestructure', add_fees_structure.addFeesStructure);
 apiRoutes.get('/getallfeestructurebyclass', get_all_fees_structure.getAllFeesStructureByClass);
 apiRoutes.put('/updatefeestructure', update_fees_structure.updateFeesStructure);
 apiRoutes.delete('/deletefeestructure', delete_fees_structure.deleteFeesStructure);
+
+apiRoutes.get('/getStandards', get_standards.getStandards)
+apiRoutes.get('/getbatchesbystandard', get_batches.getBatchesByStandardId)
 
 //Student fee
 apiRoutes.post('/addstudentfee', add_student_fee.addStudentFee);

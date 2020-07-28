@@ -15,12 +15,10 @@ var getParentsByClass = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('SELECT parents.Id, parents.FatherName, parents.MotherName'
+                connection.query('SELECT parents.id, parents.fatherName, parents.motherName'
                     + ' FROM parents INNER JOIN class_parents'
                     + ' ON parents.ID = class_parents.ParentId'
-                    + ' WHERE class_parents.ClassId = ? AND parents.Email = ?',
-
-                    [class_id, email], function (err, rows) {
+                    + ' WHERE class_parents.ClassId = ? AND parents.Email = ?', [class_id, email], function (err, rows) {
 
                         connection.release();
 
@@ -31,7 +29,7 @@ var getParentsByClass = function (req, res) {
                             
                             if (rows.length > 0) {
 
-                                res.send(JSON.stringify({ error: false, message: "Data got!", parentDetails: rows }));
+                                res.send(JSON.stringify({ error: false, message: "Data got!", parentDetail: rows[0] }));
 
                             } else {
                                 res.send(JSON.stringify({ error: true, message: "No Data found" }));
@@ -39,7 +37,6 @@ var getParentsByClass = function (req, res) {
 
                         }
                     });
-               
             }
         });
 

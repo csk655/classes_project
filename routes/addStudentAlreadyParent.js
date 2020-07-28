@@ -5,7 +5,6 @@ var addStudentAlreadyParent = function (req, res) {
 
     console.log(req.body);
 
-    var profileUrl;
     var class_id = parseInt(req.body.classId);
     var parent_id = parseInt(req.body.parentId);
     var student_name = req.body.studentName;
@@ -15,16 +14,14 @@ var addStudentAlreadyParent = function (req, res) {
     var standard_id = req.body.standardId;
     var batch = req.body.batchId;
     var email = req.body.email;
-    var blood_group = req.body.bloodGroup;
+    var fees_structure_id = req.body.feesStructureId;
     var joining_date = new Date();
     var updated_date = new Date();
+    var profileUrl = "http://10.0.2.2:6000/public/" + req.files['profile'][0].filename;
 
-    var paths = req.files.map(file => {
-        profileUrl = file.filename;
-    });
 
     if (class_id != null && student_name != null && mobile_no != null && gender != null && dob != null && standard_id != null
-        && batch != null && email != null && blood_group != null && joining_date != null && updated_date != null && profileUrl != null) {
+        && batch != null && email != null && joining_date != null && updated_date != null && profileUrl != null && fees_structure_id != null) {
 
         model(function (err, connection) {
             if (err) {
@@ -52,8 +49,8 @@ var addStudentAlreadyParent = function (req, res) {
                             res.send(JSON.stringify({ error: true, message: "Student already exists" }));
                         } else {
                             //Insert the New data
-                            connection.query('INSERT INTO students(Name, Mobile, Gender, DOB, Email, ProfilePic, BloodGroup, JoinDate, UpdateDate) VALUES(?,?,?,?,?,?,?,?,?)',
-                                [student_name, mobile_no, gender, dob, email, profileUrl, blood_group, joining_date, updated_date], function (err, result) {
+                            connection.query('INSERT INTO students(Name, Mobile, Gender, DOB, Email, ProfilePic, JoinDate, UpdateDate) VALUES(?,?,?,?,?,?,?,?)',
+                                [student_name, mobile_no, gender, dob, email, profileUrl, joining_date, updated_date], function (err, result) {
 
                                     if (err) {
                                         connection.rollback(function () {
@@ -66,7 +63,8 @@ var addStudentAlreadyParent = function (req, res) {
                                     var studentId = parseInt(result.insertId);
                                     console.log(`Student id is ${studentId}`)
 
-                                    connection.query('INSERT INTO students_detail(Student, Standard, Batch) VALUES(?,?,?)', [studentId, standard_id, batch], function (err, result) {
+                                    connection.query('INSERT INTO students_detail(Student, Standard, Batch, FeesStructureId) VALUES(?,?,?,?)',
+                                        [studentId, standard_id, batch, fees_structure_id], function (err, result) {
                                             if (err) {
                                                 connection.rollback(function () {
                                                     connection.release();

@@ -14,9 +14,9 @@ var getTeachers = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {                                                                                                                                                                            
                                         
-                connection.query('SELECT teachers.ID, teachers.Email, teachers.Mobile, teachers.Gender, teachers.Email, teachers.DOB,'
-                    + ' teachers.Address, teachers.Experience, teachers.Subject, teachers.Qualification, '
-                    + ' teachers.ProfilePic, teachers.DocPic, teachers.BloodGroup, teachers.JoinDate'
+                connection.query('SELECT teachers.id, teachers.name, teachers.email, teachers.mobile, teachers.gender, teachers.dob,'
+                    + ' teachers.address, teachers.experience, teachers.subject, teachers.qualification, '
+                    + ' teachers.profilePic, teachers.docPic, teachers.bloodGroup, teachers.joinDate'
                     + ' FROM teachers INNER JOIN class_teachers ON teachers.ID = class_teachers.TeacherId'
                     + ' WHERE class_teachers.ClassId =? AND teachers.Status = "Active"',
                     [class_id], function (err, rows) {

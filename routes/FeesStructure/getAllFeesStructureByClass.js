@@ -1,4 +1,6 @@
-var model = require('D:/node js files/Classes Project backend/config/dbconnect');
+var path = require("path");
+var dbconnectPath = path.resolve("./config/dbconnect")
+var model = require(dbconnectPath);
 
 
 var getAllFeesStructureByClass = function (req, res) {
@@ -16,7 +18,7 @@ var getAllFeesStructureByClass = function (req, res) {
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
 
-                connection.query('SELECT Id, StructureName, TotalFees FROM fees_structure WHERE ClassId = ? AND StandardId = ?', [class_id, standard_id], function (err, rows) {
+                connection.query('SELECT id, structureName, totalFees, standardId FROM fees_structure WHERE ClassId = ? AND StandardId = ?', [class_id, standard_id], function (err, rows) {
 
                     connection.release();
 

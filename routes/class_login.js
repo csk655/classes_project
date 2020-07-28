@@ -40,7 +40,7 @@ var classLogin = function (req, res) {
                                             let token = jwt.sign({ email: selectedRows[0].Email }, secretKey, {})
 
                                             delete selectedRows[0].Password;
-                                            res.send(JSON.stringify({ error: false, message: "User login succssfully", result: selectedRows, jwtToken: token }));
+                                            res.send(JSON.stringify({ error: false, message: "User login succssfully", result: selectedRows[0], jwtToken: token }));
                                         } else {
 
                                             res.send(JSON.stringify({ error: true, message: "Something went wrong!" }));

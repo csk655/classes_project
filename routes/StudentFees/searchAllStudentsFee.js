@@ -1,5 +1,6 @@
-var model = require('D:/node js files/Classes Project backend/config/dbconnect');
-
+var path = require("path");
+var dbconnectPath = path.resolve("./config/dbconnect")
+var model = require(dbconnectPath);
 
 var searchAllStudentsFee = function (req, res) {
 

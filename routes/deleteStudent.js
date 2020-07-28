@@ -39,7 +39,7 @@ var deleteStudent = function (req, res) {
         });
 
     } else {
-        return res.send(JSON.stringify({ error: true, message: "student_id,class_id,standard_id,batchId can not be null" }));
+        return res.send(JSON.stringify({ error: true, message: "student_id can not be null" }));
     }
 }
 

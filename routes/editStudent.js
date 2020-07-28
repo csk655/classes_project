@@ -1,5 +1,6 @@
 var model = require('../config/dbconnect');
 var fs = require('fs')
+var path = require('path')
 
 var editStudent = function (req, res) {
 
@@ -20,7 +21,7 @@ var editStudent = function (req, res) {
     var updated_date = new Date();
 
     var paths = req.files.map(file => {
-        new_profile = file.filename;
+        new_profile = "http://10.0.2.2:6000/public/"+ file.filename;
     });
 
     if (student_id != null && student_name != null && mobile_no != null && gender != null && dob != null && standard_id != null && batch != null
@@ -83,7 +84,7 @@ var editStudent = function (req, res) {
 
                                                                 if (is_profilechange == "Yes") {
                                                                     try {
-                                                                        fs.unlinkSync('D:/node js files/Classes Project backend/profile/' + last_profile);
+                                                                        fs.unlinkSync(path.resolve("./public/" + last_profile));
                                                                     } catch (err) {
                                                                         console.log(err)
                                                                     }
