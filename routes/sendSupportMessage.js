@@ -11,20 +11,26 @@ var sendSupport = function (req, res) {
     var description = req.body.description;
     var date = new Date();
     
-
     if (class_id != null && subject != null && description != null) {
 
         model(function (err, connection) {
             if (err) {
                 console.log(err);
-                res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
+                res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool'}));
             } else {
 
-                connection.query('INSERT INTO support(Class, Subject, Description, Date) VALUES(?,?,?,?)',[class_id, subject, description, date], function (err, rows) {
+                connection.beginTransaction(function (err) {
+                    if (err) { throw err; }
 
+                    connection.query('INSERT INTO support(Class, Subject, Description, Date) VALUES(?,?,?,?)', [class_id, subject, description, date], function (err, rows) {
+                      
                         if (err) {
-                            res.status(500);
-                            res.send(JSON.stringify({ error: true, message: err.message }));
+                            connection.rollback(function () {
+                                connection.release();
+                                res.status(500);
+                                res.send(JSON.stringify({ error: true, message: err.message }));
+                                throw err;
+                            });
                         } else {
 
                             if (rows.affectedRows > 0) {
@@ -36,17 +42,35 @@ var sendSupport = function (req, res) {
                                 constants.transporter.sendMail(mailOptions, function (error, info) {
                                     if (error) {
                                         console.log(error);
-                                        res.send(JSON.stringify({ error: false, message: "Data inserted but not able to send mail to support team" }));
+                                        connection.rollback(function () {
+                                            connection.release();
+                                            res.status(500);
+                                            res.send(JSON.stringify({ error: true, message: "Email couldn't be sent. Please try later"}));
+                                            throw err;
+                                        });
                                     } else {
-                                        console.log('Email sent: ' + info.response);
-                                        res.send(JSON.stringify({ error: false, message: "Success! Mail has been sent to support team. We get back to you soon." }));
+                                        connection.commit(function (err) {
+                                            if (err) {
+                                                connection.rollback(function () {
+                                                    connection.release();
+                                                    res.send(JSON.stringify({ error: true, message: err.message }));
+                                                    throw err;
+                                                });
+                                            } else {
+                                                connection.release();
+                                                console.log('Email sent: ' + info.response);
+                                                res.send(JSON.stringify({ error: false, message: "Success! Mail has been sent to support team. We get back to you soon."}));
+                                            }
+                                        });
+
                                     }
                                 });
 
                             }
                         }
                     });
-                connection.release();
+
+                })            
             }
         });
 

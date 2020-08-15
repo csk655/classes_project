@@ -15,17 +15,17 @@ var editStudent = function (req, res) {
     var standard_id = req.body.standardId;
     var batch = req.body.batchId;
     var email = req.body.email;
-    var blood_group = req.body.bloodGroup;
     var is_profilechange = req.body.isProfileChange;
     var last_profile = req.body.lastProfile;
     var updated_date = new Date();
+    var fees_structure_id = req.body.feesStructureId;
 
-    var paths = req.files.map(file => {
-        new_profile = "http://10.0.2.2:6000/public/"+ file.filename;
-    });
+    if (is_profilechange == "Yes")
+        new_profile = "http://10.0.2.2:6000/public/" + req.files['profile'][0].filename; //change this and below line at server side
+    
 
     if (student_id != null && student_name != null && mobile_no != null && gender != null && dob != null && standard_id != null && batch != null
-        && email != null && blood_group != null && updated_date != null) {
+        && email != null && updated_date != null) {
 
         model(function (err, connection) {
             if (err) {
@@ -41,13 +41,13 @@ var editStudent = function (req, res) {
                     if (is_profilechange == "Yes") {
                         if (new_profile != null) {
                             query = 'UPDATE students SET Name="' + student_name + '", Mobile="' + mobile_no + '", Gender="' + gender + '", DOB="' + dob + '", Email="' + email + '",'
-                                + 'ProfilePic="' + new_profile + '", BloodGroup="' + blood_group + '", UpdateDate="' + updated_date + '" WHERE ID ="' + student_id + '"'
+                                + 'ProfilePic="' + new_profile + '", UpdateDate="' + updated_date + '" WHERE ID ="' + student_id + '"'
                         } else {
                             return res.send(JSON.stringify({ error: true, message: "new_profile can not be null" }));
                         }
                     } else {
                         query = 'UPDATE students SET Name="' + student_name + '", Mobile="' + mobile_no + '", Gender="' + gender + '", DOB="' + dob + '", Email="' + email + '",'
-                            + 'BloodGroup="' + blood_group + '", UpdateDate="' + updated_date + '" WHERE ID ="' + student_id + '"'
+                            + 'UpdateDate="' + updated_date + '" WHERE ID ="' + student_id + '"'
                     }
 
                     connection.query(query, function (err, results) {
@@ -62,7 +62,7 @@ var editStudent = function (req, res) {
 
                                     if (results.affectedRows > 0) {
 
-                                        connection.query('UPDATE students_detail SET Standard=?, Batch=? WHERE Student = ?', [standard_id, batch, student_id], function (err, results) {
+                                        connection.query('UPDATE students_detail SET Standard=?, Batch=?, FeesStructureId=? WHERE Student = ?', [standard_id, batch, fees_structure_id, student_id], function (err, results) {
 
                                                 if (err) {
                                                     connection.rollback(function () {

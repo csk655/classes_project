@@ -16,9 +16,8 @@ var sendSupportReply = function (req, res) {
                 console.log(err);
                 res.send(JSON.stringify({ error: true, message: 'Error occured with dbconnection pool' }));
             } else {
-
                 connection.query('INSERT INTO support_reply(support_id,support_reply,class_id,date) VALUES(?,?,?,?)', [support_id, reply, class_id, date], function (err, rows) {
-
+                    connection.release();
                     if (err) {
                         res.status(500);
                         res.send(JSON.stringify({ error: true, message: err.message }));
@@ -30,7 +29,6 @@ var sendSupportReply = function (req, res) {
                         }
                     }
                 });
-                connection.release();
             }
         });
 

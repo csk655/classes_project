@@ -36,14 +36,14 @@ var deleteStandardBatch = function (req, res) {
             } else {
 
                 connection.query('DELETE FROM class_standard_batch WHERE (ID) IN (?)', [std_bat_delete_id], function (err, rows) {
-
+                    connection.release();
                         if (err) {
                             res.send(JSON.stringify({ error: true, message: err.message }));
                         } else {
                             res.send(JSON.stringify({ error: false, message: "Delete Success" }));
                         }
                 });
-                connection.release();
+                
             }
         });
 

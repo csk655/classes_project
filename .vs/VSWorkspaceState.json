@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
     "",
-    "\\config"
+    "\\config",
+    "\\routes"
   ],
   "SelectedNode": "\\public",
   "PreviewInSolutionExplorer": false

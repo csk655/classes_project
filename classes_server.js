@@ -58,6 +58,8 @@ var add_student_fee = require('./routes/StudentFees/addStudentFee');
 var get_all_students_fees = require('./routes/StudentFees/getAllStudentsFeeByClass');
 var search_all_students_fees = require('./routes/StudentFees/searchAllStudentsFee');
 
+var getParentByStudent = require('./routes/getParentByStudent');
+var editParent = require('./routes/editParent');
 
 //----------------------------------TEACHER MODULE IMPORTS---------------------------------------------//
 
@@ -97,15 +99,18 @@ apiRoutes.use(verifyToken);
 apiRoutes.post('/addnewteacher', upload.fields([{ name: 'profile', maxCount: 1},{ name: 'document', maxCount: 1 }]), add_teacher.addTeacher);
 apiRoutes.put('/editteacher', upload.fields([{ name: 'profile', maxCount: 1 }, { name: 'document', maxCount: 1 }]), edit_teacher.editTeacher);
 apiRoutes.post('/addnewstudent', upload.fields([{ name: 'profile', maxCount: 1 }]), add_new_student.addNewStudent);
-apiRoutes.put('/editstudent', upload.array('profiles', 1), edit_student.editStudent);
+apiRoutes.put('/editstudent', upload.fields([{ name: 'profile', maxCount: 1 }]), edit_student.editStudent);
 apiRoutes.post('/addstudentalreadyparent', upload.fields([{ name: 'profile', maxCount: 1 }]), add_student_already_parent.addStudentAlreadyParent)
 apiRoutes.get('/getparentbyclass', get_parent.getParentsByClass);
+apiRoutes.get('/getparentbystudent', getParentByStudent.getParentByStudent)
+apiRoutes.put('/editParent', editParent.editParent);
 
 //Get Teachers and Students
 apiRoutes.get('/getteachersbyclassid', get_teachers.getTeachers);
 apiRoutes.get('/getstudentsbyclassid', get_students.getStudents);
 
-//Delete Student and teacher
+
+//Delete Student and teacher 
 apiRoutes.delete('/deletestudentbyid', delete_student.deleteStudent);
 apiRoutes.delete('/deleteteacherbyid', delete_teacher.deleteTeacher);
 
@@ -120,7 +125,7 @@ apiRoutes.get('/getmessagebyclass', get_messages.getMessages);
 
 //Support
 apiRoutes.post('/sendsupportmessage', sendSupportMessage.sendSupport);
-apiRoutes.get('/getsupportmessage', getSuppoertMessages.getSupportMessagesByClass);
+apiRoutes.get('/getsupportmessages', getSuppoertMessages.getSupportMessagesByClass);
 
 //Support reply for our use
 apiRoutes.post('/sendsupportreply', sendSupportReply.sendSupportReply)
